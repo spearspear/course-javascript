@@ -33,13 +33,36 @@ import './towns.html';
 
 const homeworkContainer = document.querySelector('#app');
 
+let DATA = [];
 /*
  Функция должна вернуть Promise, который должен быть разрешен с массивом городов в качестве значения
 
  Массив городов пожно получить отправив асинхронный запрос по адресу
  https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json
  */
-function loadTowns() {}
+function loadTowns() {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(
+      'GET',
+      'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json'
+    );
+    xhr.onload = () =>
+      resolve(
+        JSON.parse(xhr.responseText).sort((a, b) => {
+          if (a.name > b.name) {
+            return 1;
+          }
+          if (a.name < b.name) {
+            return -1;
+          }
+          return 0;
+        })
+      );
+    xhr.onerror = () => reject(xhr.statusText);
+    xhr.send();
+  });
+}
 
 /*
  Функция должна проверять встречается ли подстрока chunk в строке full
@@ -52,7 +75,9 @@ function loadTowns() {}
    isMatching('Moscow', 'SCO') // true
    isMatching('Moscow', 'Moscov') // false
  */
-function isMatching(full, chunk) {}
+function isMatching(full, chunk) {
+  return full.includes(chunk);
+}
 
 /* Блок с надписью "Загрузка" */
 const loadingBlock = homeworkContainer.querySelector('#loading-block');
@@ -67,8 +92,33 @@ const filterInput = homeworkContainer.querySelector('#filter-input');
 /* Блок с результатами поиска */
 const filterResult = homeworkContainer.querySelector('#filter-result');
 
+loadingBlock.remove();
+loadingFailedBlock.remove();
+filterBlock.remove();
+
 retryButton.addEventListener('click', () => {});
 
-filterInput.addEventListener('input', function () {});
+const ulBlock = document.createElement('ul');
+filterResult.appendChild(ulBlock);
+
+filterInput.addEventListener('input', function (e) {
+  const tempData = [];
+  const value = e.target.value;
+
+  DATA.map((item) => {
+    isMatching(item.name.toLowerCase(), value.toLowerCase()) && tempData.push(item);
+  });
+  filterResult.innerHTML = tempData.map((item) => {
+    `<li> City name: ${item.name} </li>`;
+  });
+});
+
+loadTowns().then((result) => {
+  DATA = result;
+});
+
+filterResult.firstChild.innerHTML = DATA.map((item) => {
+  `<li> City name: ${item.name} </li>`;
+});
 
 export { loadTowns, isMatching };
