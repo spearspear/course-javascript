@@ -30,7 +30,6 @@
  */
 
 import './towns.html';
-
 const homeworkContainer = document.querySelector('#app');
 
 let DATA = [];
@@ -41,27 +40,26 @@ let DATA = [];
  https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json
  */
 function loadTowns() {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open(
-      'GET',
-      'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json'
-    );
-    xhr.onload = () =>
-      resolve(
-        JSON.parse(xhr.responseText).sort((a, b) => {
-          if (a.name > b.name) {
-            return 1;
-          }
-          if (a.name < b.name) {
-            return -1;
-          }
-          return 0;
-        })
-      );
-    xhr.onerror = () => reject(xhr.statusText);
-    xhr.send();
-  });
+  const data = fetch(
+    'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json'
+  )
+    .then((response) => {
+      response;
+      return response.json();
+    })
+    .then((data) => {
+      data.sort((a, b) => {
+        if (a.name > b.name) {
+          return 1;
+        }
+        if (a.name < b.name) {
+          return -1;
+        }
+        return 0;
+      });
+      return data;
+    });
+  return data;
 }
 
 /*
@@ -92,11 +90,10 @@ const filterInput = homeworkContainer.querySelector('#filter-input');
 /* Блок с результатами поиска */
 const filterResult = homeworkContainer.querySelector('#filter-result');
 
-loadingBlock.remove();
-loadingFailedBlock.remove();
-filterBlock.remove();
-
 retryButton.addEventListener('click', () => {});
+loadingBlock.addEventListener('click', () => {});
+loadingFailedBlock.addEventListener('click', () => {});
+filterBlock.addEventListener('click', () => {});
 
 const ulBlock = document.createElement('ul');
 filterResult.appendChild(ulBlock);
