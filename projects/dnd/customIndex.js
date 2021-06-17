@@ -15,11 +15,14 @@
    const newDiv = document.createElement('div');
    homeworkContainer.appendChild(newDiv);
  */
-import './dnd.html';
 
 const homeworkContainer = document.querySelector('#app');
 
-export function createDiv() {
+console.log(document.querySelector('#app'));
+
+document.addEventListener('mousemove', (e) => {});
+
+function createDiv() {
   //Rand number for size and position
   const randInt = (min, max) => {
     min = Math.ceil(min);
