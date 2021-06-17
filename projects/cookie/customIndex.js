@@ -22,17 +22,15 @@
 
  Запрещено использовать сторонние библиотеки. Разрешено пользоваться только тем, что встроено в браузер
  */
-
-import './cookie.html';
-
 /*
- app - это контейнер для всех ваших домашних заданий
- Если вы создаете новые html-элементы и добавляете их на страницу, то добавляйте их только в этот контейнер
+  app - это контейнер для всех ваших домашних заданий
+  Если вы создаете новые html-элементы и добавляете их на страницу, то добавляйте их только в этот контейнер
+ 
+  Пример:
+    const newDiv = document.createElement('div');
+    homeworkContainer.appendChild(newDiv);
+  */
 
- Пример:
-   const newDiv = document.createElement('div');
-   homeworkContainer.appendChild(newDiv);
- */
 const homeworkContainer = document.querySelector('#app');
 // текстовое поле для фильтрации cookie
 const filterNameInput = homeworkContainer.querySelector('#filter-name-input');
@@ -44,14 +42,89 @@ const addValueInput = homeworkContainer.querySelector('#add-value-input');
 const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
+let nameCook = '';
+let valueCook = '';
 
-addNameInput.addEventListener('input', () => {});
-addValueInput.addEventListener('input', () => {});
-
-filterNameInput.addEventListener('input', function () {
-  console.log('typing');
+addNameInput.addEventListener('input', (e) => {
+  nameCook = e.target.value;
 });
 
-addButton.addEventListener('click', () => {});
+addValueInput.addEventListener('input', (e) => {
+  valueCook = e.target.value;
+});
 
-listTable.addEventListener('click', (e) => {});
+addButton.addEventListener('click', () => {
+  document.cookie = `${nameCook}=${valueCook}`;
+  showCookie();
+});
+
+const cookies = document.cookie.split('; ');
+
+const tableContent = cookies.map((item) => {
+  const [name, value] = item.split('=');
+  const tableItem = document.createElement('tr');
+
+  const tableItemButton = document.createElement('td');
+  const tableItemName = document.createElement('td');
+  const tableItemValue = document.createElement('td');
+  const button = document.createElement('button');
+  button.textContent = 'Delete';
+  tableItemName.textContent = name;
+  tableItemValue.textContent = value;
+
+  tableItem.appendChild(tableItemName);
+  tableItem.appendChild(tableItemValue);
+  tableItem.appendChild(tableItemButton.appendChild(button));
+  return tableItem;
+});
+
+const showCookie = () => {
+  while (listTable.firstChild) {
+    listTable.removeChild(listTable.firstChild);
+  }
+
+  for (let i = 0; i < tableContent.length; i++) {
+    listTable.appendChild(tableContent[i]);
+  }
+};
+
+showCookie();
+
+filterNameInput.addEventListener('input', function (e) {
+  const value = e.target.value;
+
+  const valueFilter = (word) => {
+    return word.childNodes[0].textContent.includes(value);
+  };
+
+  while (listTable.firstChild) {
+    listTable.removeChild(listTable.firstChild);
+  }
+
+  const result = [...tableContent].filter(valueFilter);
+  console.log(result.length);
+
+  if (result.length !== 0) {
+    for (let i = 0; i < result.length; i++) {
+      listTable.appendChild(result[i]);
+    }
+    console.log(listTable.childNodes);
+  } else {
+    listTable.innerHTML = '<p>NO MATCHES</p>';
+  }
+  if (value === '') {
+    showCookie();
+  }
+});
+
+listTable.addEventListener('click', (e) => {
+  if (e.target.tagName === 'BUTTON') {
+    const cookieName = e.target.parentNode.childNodes[0].textContent;
+    document.cookie =
+      cookieName +
+      '=;' +
+      'expires=expires=Thu, 01 Jan 1970 00:00:01 GMT;' +
+      'path=/home/abakhar/Documents/js-loft/course-javascript/projects/cookie';
+    showCookie();
+  }
+});
